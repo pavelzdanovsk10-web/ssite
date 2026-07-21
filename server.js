@@ -1411,51 +1411,59 @@ async function notifyDiscordEventStarted(data) {
   if (!discordClient?.isReady()) return '';
   const EmbedBuilder = discordClient.portalEmbedBuilder;
   const startedTs = Math.floor(new Date(data.startedAt).getTime() / 1000);
+
   const embed = new EmbedBuilder()
-    .setTitle('🟢 ПРОТОКОЛ ИВЕНТА АКТИВИРОВАН')
-    .setDescription('**Мы вас ждём!**')
+    .setColor(0x5865F2)
+    .setTitle('🎮 НАЧИНАЕТСЯ ИВЕНТ!')
+    .setDescription(`## ${data.eventName || 'Без названия'}
+Заходите на сервер и присоединяйтесь — **мы вас ждём!**`)
     .addFields(
-      { name: 'Название ивента', value: data.eventName || 'Не указано', inline: false },
-      { name: 'Проводящий', value: eventHostLabel(data), inline: true },
-      { name: 'Сколько идёт', value: `<t:${startedTs}:R>`, inline: true },
-      { name: 'Сервер', value: data.serverId, inline: true },
-      { name: 'Статус', value: 'ИДЁТ', inline: true },
-      { name: 'Начало', value: `<t:${startedTs}:F>`, inline: false }
+      { name: '👑 Проводящий', value: eventHostLabel(data), inline: true },
+      { name: '⏱ Уже идёт', value: `<t:${startedTs}:R>`, inline: true },
+      { name: '🖥 Сервер', value: data.serverId || 'Не указан', inline: true },
+      { name: '🕒 Начало', value: `<t:${startedTs}:F>`, inline: false }
     )
-    .setFooter({ text: 'Foundation Portal' })
+    .setFooter({ text: 'SCP:SL • Серверные ивенты' })
     .setTimestamp(new Date(data.startedAt));
 
   const message = await sendDiscordEventMessage({
     embeds: [embed],
     allowedMentions: data.hostDiscordId ? { users: [data.hostDiscordId] } : { parse: [] }
   });
-  if (message) await sendDiscordAudit(`Ивент **${data.eventName}** запущен на сервере **${data.serverId}**.`);
+
+  if (message) {
+    await sendDiscordAudit(`Ивент **${data.eventName}** начался на сервере **${data.serverId}**.`);
+  }
+
   return message?.id || '';
 }
 
 async function notifyDiscordEventFinished(data) {
   if (!discordClient?.isReady()) return;
   const EmbedBuilder = discordClient.portalEmbedBuilder;
+
   const embed = new EmbedBuilder()
-    .setTitle('🔴 ПРОТОКОЛ ИВЕНТА ЗАВЕРШЁН')
-    .setDescription('Ивент завершён.')
+    .setColor(0x57F287)
+    .setTitle('✅ ИВЕНТ ЗАВЕРШЁН')
+    .setDescription(`## ${data.eventName || 'Без названия'}
+Спасибо всем, кто принял участие!`)
     .addFields(
-      { name: 'Название ивента', value: data.eventName || 'Не указано', inline: false },
-      { name: 'Проводящий', value: eventHostLabel(data), inline: true },
-      { name: 'Продолжительность', value: durationLabel(data.durationSeconds), inline: true },
-      { name: 'Сервер', value: data.serverId, inline: true },
-      { name: 'Статус', value: 'ЗАВЕРШЁН', inline: true }
+      { name: '👑 Проводящий', value: eventHostLabel(data), inline: true },
+      { name: '⏱ Продолжительность', value: durationLabel(data.durationSeconds), inline: true },
+      { name: '🖥 Сервер', value: data.serverId || 'Не указан', inline: true }
     )
-    .setFooter({ text: 'Foundation Portal' })
+    .setFooter({ text: 'SCP:SL • Серверные ивенты' })
     .setTimestamp();
 
   const payload = {
     embeds: [embed],
     allowedMentions: data.hostDiscordId ? { users: [data.hostDiscordId] } : { parse: [] }
   };
+
   const edited = await editDiscordEventMessage(data.originalMessageId, payload);
   if (!edited) await sendDiscordEventMessage(payload);
-  await sendDiscordAudit(`Ивент **${data.eventName}** завершён: ${durationLabel(data.durationSeconds)}.`);
+
+  await sendDiscordAudit(`Ивент **${data.eventName}** завершён. Продолжительность: ${durationLabel(data.durationSeconds)}.`);
 }
 
 async function notifyDiscordEventCancelled(data) {
