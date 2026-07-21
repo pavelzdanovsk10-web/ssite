@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090b0c" />
+  <title>Портал администрации SCP:SL</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="background-grid" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <section id="login-screen" class="auth-screen">
+    <div class="auth-shell">
+      <header class="auth-brand">
+        <div class="site-mark">82</div>
+        <div>
+          <span>ЗОНА 82-EX</span>
+          <strong>ПОРТАЛ АДМИНИСТРАЦИИ SCP:SL</strong>
+        </div>
+      </header>
+
+      <div class="auth-meta">
+        <span>УРОВЕНЬ ДОПУСКА: ЗАКРЫТЫЙ</span>
+        <span>ДОКУМЕНТ: ADM/AUTH/01</span>
+        <span>СТАТУС: ONLINE</span>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-copy">
+          <p class="section-code">ИДЕНТИФИКАЦИЯ ПЕРСОНАЛА</p>
+          <h1>Личный кабинет администратора</h1>
+          <p>Авторизация в кадровой системе, статистике ивентов и защищённых каналах связи.</p>
+          <div class="access-note">
+            <b>ACCESS CONTROL</b>
+            <span>Несанкционированное использование системы фиксируется в журнале.</span>
+          </div>
+        </div>
+
+        <div class="auth-forms">
+          <div class="auth-tabs">
+            <button id="show-login" class="auth-tab active" type="button">Вход</button>
+            <button id="show-register" class="auth-tab" type="button">Регистрация</button>
+          </div>
+
+          <form id="login-form" class="auth-form">
+            <label>Идентификатор
+              <input name="login" autocomplete="username" required placeholder="administrator" />
+            </label>
+            <label>Код доступа
+              <input name="password" type="password" autocomplete="current-password" required placeholder="••••••••" />
+            </label>
+            <button type="submit" class="primary wide">Авторизоваться</button>
+            <p id="login-error" class="error"></p>
+          </form>
+
+          <form id="register-form" class="auth-form hidden">
+            <label>Логин
+              <input name="login" autocomplete="username" required placeholder="admin_name" />
+            </label>
+            <label>Игровой ник
+              <input name="nickname" required maxlength="40" placeholder="AdminName" />
+            </label>
+            <label>Пароль
+              <input name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="Минимум 8 символов" />
+            </label>
+            <label id="registration-code-label" class="hidden">Код регистрации
+              <input name="registrationCode" placeholder="Код приглашения" />
+            </label>
+            <button type="submit" class="primary wide">Создать досье</button>
+            <p class="muted small">После регистрации аккаунт получает допуск 0 до подтверждения руководителем.</p>
+            <p id="register-error" class="error"></p>
+          </form>
+        </div>
+      </div>
+
+      <footer class="auth-footer">
+        КЛАССИФИКАЦИЯ: ВНУТРЕННЕЕ ИСПОЛЬЗОВАНИЕ · КАНАЛ ЗАШИФРОВАН
+      </footer>
+    </div>
+  </section>
+
+  <div id="app" class="app hidden">
+    <header class="global-header">
+      <a class="global-brand" href="#profile" data-view="profile">
+        <span class="site-mark small-mark">82</span>
+        <span><b>ЗОНА 82-EX</b><small>ПОРТАЛ АДМИНИСТРАЦИИ</small></span>
+      </a>
+      <button id="mobile-menu-btn" class="mobile-menu-btn" type="button">МЕНЮ</button>
+      <nav id="main-nav" class="main-nav">
+        <button data-view="profile" class="nav-item active"><span>01</span> Личное досье</button>
+        <button data-view="events" class="nav-item"><span>02</span> Ивенты</button>
+        <button data-view="ranking" class="nav-item"><span>03</span> Рейтинг</button>
+        <button data-view="staff" class="nav-item"><span>04</span> Состав</button>
+        <button data-view="chat" class="nav-item"><span>05</span> Связь</button>
+        <button data-view="audit" class="nav-item admin-only"><span>06</span> Журнал</button>
+      </nav>
+      <div class="header-user">
+        <div id="current-user-mini"></div>
+        <button id="logout-btn" class="text-button danger">Выйти</button>
+      </div>
+    </header>
+
+    <div class="document-strip">
+      <span>УРОВЕНЬ ДОПУСКА: <b id="strip-level">0</b></span>
+      <span>ДОКУМЕНТ: <b id="strip-document">ADM/PERSONAL/01</b></span>
+      <span>СТАТУС: <b id="strip-status">АКТИВЕН</b></span>
+      <span class="strip-warning">НЕСАНКЦИОНИРОВАННОЕ РАСПРОСТРАНЕНИЕ ЗАПРЕЩЕНО</span>
+    </div>
+
+    <main class="main-content">
+      <div id="pending-banner" class="pending-banner hidden">
+        <b>ДОСЬЕ ОЖИДАЕТ ПОДТВЕРЖДЕНИЯ</b>
+        <span>Привяжите Discord и Steam. Должность и уровень допуска назначит руководитель.</span>
+      </div>
+
+      <section id="view-profile" class="view active">
+        <div class="section-heading">
+          <div>
+            <p class="section-code">01 · КАДРОВОЕ ДОСЬЕ</p>
+            <h1>Личное дело администратора</h1>
+          </div>
+          <button id="change-avatar-btn" class="outline-button" type="button">Изменить фото</button>
+        </div>
+
+        <article class="dossier-hero">
+          <div id="profile-avatar" class="profile-avatar"></div>
+          <div class="dossier-name">
+            <span id="profile-record-id" class="record-id">ADM-0000</span>
+            <h2 id="profile-name">Сотрудник</h2>
+            <p id="profile-position">Должность не назначена</p>
+            <div class="badge-line">
+              <span id="profile-level" class="access-badge">ДОПУСК 0</span>
+              <span id="profile-status" class="status-badge">ОЖИДАЕТ</span>
+            </div>
+          </div>
+          <div class="dossier-seal">
+            <span>PERSONNEL</span>
+            <b>82-EX</b>
+            <small>VERIFIED FILE</small>
+          </div>
+        </article>
+
+        <div id="profile-stats" class="metric-grid"></div>
+
+        <div class="profile-grid">
+          <article class="document-panel">
+            <div class="panel-title">
+              <span>01-A</span>
+              <div><p>СЛУЖЕБНЫЕ ДАННЫЕ</p><h3>Положение в администрации</h3></div>
+            </div>
+            <dl id="service-data" class="data-list"></dl>
+          </article>
+
+          <article class="document-panel">
+            <div class="panel-title">
+              <span>01-B</span>
+              <div><p>ВНЕШНИЕ ИДЕНТИФИКАТОРЫ</p><h3>Привязка аккаунтов</h3></div>
+            </div>
+            <div id="integration-cards" class="integration-cards"></div>
+          </article>
+        </div>
+
+        <article class="document-panel discipline-panel">
+          <div class="panel-title">
+            <span>01-C</span>
+            <div><p>ДИСЦИПЛИНАРНЫЙ РЕЕСТР</p><h3>Предупреждения и выговоры</h3></div>
+          </div>
+          <div id="my-discipline" class="responsive-table"></div>
+        </article>
+
+        <article class="document-panel history-panel">
+          <div class="panel-title history-title">
+            <span>01-D</span>
+            <div><p>АРХИВ ОПЕРАЦИЙ</p><h3>Проведённые ивенты</h3></div>
+            <b id="my-event-total" class="event-total">0 ИВЕНТОВ</b>
+          </div>
+          <p class="history-intro">Ниже — история:</p>
+          <div id="my-events" class="responsive-table"></div>
+        </article>
+      </section>
+
+      <section id="view-events" class="view">
+        <div class="section-heading">
+          <div><p class="section-code">02 · РЕЕСТР ИВЕНТОВ</p><h1>Серверные мероприятия</h1></div>
+          <button id="refresh-events-btn" class="outline-button" type="button">Обновить</button>
+        </div>
+        <div id="event-rule-cards" class="rule-grid"></div>
+        <article class="document-panel">
+          <div class="panel-title">
+            <span>02-A</span>
+            <div><p>ОБЩИЙ ЖУРНАЛ</p><h3>История и состояние ивентов</h3></div>
+          </div>
+          <div id="events-table" class="responsive-table"></div>
+        </article>
+      </section>
+
+      <section id="view-ranking" class="view">
+        <div class="section-heading">
+          <div><p class="section-code">03 · ОПЕРАТИВНАЯ ЭФФЕКТИВНОСТЬ</p><h1>Рейтинг организаторов</h1></div>
+        </div>
+        <div id="ranking-podium" class="podium"></div>
+        <article class="document-panel">
+          <div class="panel-title">
+            <span>03-A</span>
+            <div><p>СВОДНАЯ ТАБЛИЦА</p><h3>Баллы и проведённые ивенты</h3></div>
+          </div>
+          <div id="ranking-table" class="responsive-table"></div>
+        </article>
+      </section>
+
+      <section id="view-staff" class="view">
+        <div class="section-heading staff-heading">
+          <div><p class="section-code">04 · КАДРОВЫЙ РЕЕСТР</p><h1>Состав администрации</h1></div>
+          <button id="add-user-btn" class="primary admin-only" type="button">Создать аккаунт</button>
+        </div>
+        <div class="staff-tools">
+          <input id="staff-search" placeholder="Поиск по нику, должности или Steam/Discord" />
+          <select id="staff-filter">
+            <option value="all">Все сотрудники</option>
+            <option value="approved">Подтверждённые</option>
+            <option value="pending">Ожидают подтверждения</option>
+          </select>
+        </div>
+        <div id="staff-grid" class="staff-grid"></div>
+      </section>
+
+      <section id="view-chat" class="view chat-layout">
+        <aside class="chat-list-panel document-panel">
+          <div class="panel-title compact-title">
+            <span>05-A</span>
+            <div><p>ЗАЩИЩЁННАЯ СВЯЗЬ</p><h3>Каналы</h3></div>
+            <button id="new-chat-btn" class="square-button" title="Новый чат" type="button">+</button>
+          </div>
+          <div id="conversation-list" class="conversation-list"></div>
+        </aside>
+        <div class="chat-panel document-panel">
+          <div id="chat-empty" class="empty-state">
+            <div class="empty-icon">⌁</div>
+            <h3>Выберите канал связи</h3>
+            <p>Личные и групповые сообщения доступны авторизованному персоналу.</p>
+          </div>
+          <div id="chat-active" class="hidden chat-active">
+            <div id="chat-header" class="chat-header"></div>
+            <div id="messages" class="messages"></div>
+            <form id="message-form" class="message-form">
+              <textarea id="message-input" rows="1" maxlength="2000" placeholder="Введите защищённое сообщение..."></textarea>
+              <button class="primary" type="submit">Отправить</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-audit" class="view">
+        <div class="section-heading">
+          <div><p class="section-code">06 · СИСТЕМНЫЙ ЖУРНАЛ</p><h1>Административные действия</h1></div>
+        </div>
+        <article class="document-panel">
+          <div id="audit-list" class="audit-list"></div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div><b>ЗОНА 82-EX</b><span>Закрытый портал администрации SCP:SL</span></div>
+      <span>SYNC ONLINE · DATABASE CONNECTED · ACCESS LOGGED</span>
+    </footer>
+  </div>
+
+  <dialog id="user-dialog">
+    <form method="dialog" class="modal" id="user-form">
+      <div class="modal-head"><div><p class="section-code">КАДРОВАЯ ОПЕРАЦИЯ</p><h3 id="user-modal-title">Новый сотрудник</h3></div><button value="cancel" class="square-button">×</button></div>
+      <input type="hidden" name="id" />
+      <div class="form-grid">
+        <label>Логин<input name="login" required /></label>
+        <label>Пароль<input name="password" type="password" /></label>
+        <label>Ник<input name="nickname" required /></label>
+        <label>Должность<input name="position" placeholder="Администратор" /></label>
+        <label>Роль<select name="role"><option value="employee">Сотрудник</option><option value="supervisor">Куратор</option><option value="admin">Администратор</option></select></label>
+        <label>Уровень допуска<select name="accessLevel"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+        <label>Строгие выговоры<select name="strictReprimands"><option>0</option><option>1</option><option>2</option><option>3</option></select></label>
+        <label>Устные предупреждения<select name="verbalWarnings"><option>0</option><option>1</option><option>2</option><option>3</option></select></label>
+        <label>Discord ID<input name="discordId" placeholder="123456789012345678" /></label>
+        <label>Discord имя<input name="discordUsername" placeholder="AdminName" /></label>
+        <label>SteamID64<input name="steamId" placeholder="7656119..." /></label>
+        <label>Steam имя<input name="steamUsername" placeholder="AdminName" /></label>
+        <label>Статус<input name="status" value="Активен" /></label>
+        <label class="checkbox-label"><input name="approved" type="checkbox" checked /> Аккаунт подтверждён</label>
+      </div>
+      <p id="user-form-error" class="error"></p>
+      <div class="modal-actions"><button value="cancel" class="outline-button">Отмена</button><button id="delete-user-btn" type="button" class="outline-button danger hidden">Удалить</button><button type="submit" class="primary">Сохранить</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="profile-dialog">
+    <div class="modal profile-modal">
+      <div class="modal-head"><div><p class="section-code">КАДРОВОЕ ДОСЬЕ</p><h3 id="staff-profile-title">Сотрудник</h3></div><button id="close-profile-dialog" class="square-button" type="button">×</button></div>
+      <div id="staff-profile-body"></div>
+    </div>
+  </dialog>
+
+  <dialog id="discipline-dialog">
+    <form method="dialog" class="modal" id="discipline-form">
+      <div class="modal-head"><div><p class="section-code">ДИСЦИПЛИНАРНЫЙ ПРОТОКОЛ</p><h3>Выдать взыскание</h3></div><button value="cancel" class="square-button">×</button></div>
+      <input type="hidden" name="userId" />
+      <label>Тип<select name="type"><option value="verbal">Устное предупреждение</option><option value="strict">Строгий выговор</option></select></label>
+      <label>Причина<textarea name="reason" required maxlength="300"></textarea></label>
+      <label>Комментарий<textarea name="comment" maxlength="1000"></textarea></label>
+      <p id="discipline-form-error" class="error"></p>
+      <div class="modal-actions"><button value="cancel" class="outline-button">Отмена</button><button type="submit" class="primary">Зафиксировать</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="chat-dialog">
+    <form method="dialog" class="modal" id="chat-form">
+      <div class="modal-head"><div><p class="section-code">СЕТЬ СВЯЗИ</p><h3>Новый канал</h3></div><button value="cancel" class="square-button">×</button></div>
+      <label>Тип<select name="type" id="chat-type"><option value="direct">Личный чат</option><option value="group">Группа</option></select></label>
+      <label id="group-title-label" class="hidden">Название группы<input name="title" maxlength="60" /></label>
+      <div><span class="label-text">Участники</span><div id="member-picker" class="member-picker"></div></div>
+      <p id="chat-form-error" class="error"></p>
+      <div class="modal-actions"><button value="cancel" class="outline-button">Отмена</button><button type="submit" class="primary">Создать</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="avatar-dialog">
+    <form method="dialog" class="modal" id="avatar-form">
+      <div class="modal-head"><div><p class="section-code">ОБНОВЛЕНИЕ ДОСЬЕ</p><h3>Изменить фотографию</h3></div><button value="cancel" class="square-button">×</button></div>
+      <input type="hidden" name="userId" />
+      <label>Файл изображения<input type="file" name="avatar" accept="image/png,image/jpeg,image/webp,image/gif" required /></label>
+      <p class="muted small">Максимальный размер — 2 МБ.</p>
+      <p id="avatar-form-error" class="error"></p>
+      <div class="modal-actions"><button value="cancel" class="outline-button">Отмена</button><button type="submit" class="primary">Загрузить</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
