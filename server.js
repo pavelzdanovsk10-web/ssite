@@ -1410,17 +1410,19 @@ function eventHostLabel(data) {
 async function notifyDiscordEventStarted(data) {
   if (!discordClient?.isReady()) return '';
   const EmbedBuilder = discordClient.portalEmbedBuilder;
+  const startedTs = Math.floor(new Date(data.startedAt).getTime() / 1000);
   const embed = new EmbedBuilder()
     .setTitle('🟢 ПРОТОКОЛ ИВЕНТА АКТИВИРОВАН')
-    .setDescription(`**${data.eventName}**`)
+    .setDescription('**Мы вас ждём!**')
     .addFields(
-      { name: 'Организатор', value: eventHostLabel(data), inline: true },
-      { name: 'Должность', value: data.hostPosition || 'Не указана', inline: true },
+      { name: 'Название ивента', value: data.eventName || 'Не указано', inline: false },
+      { name: 'Проводящий', value: eventHostLabel(data), inline: true },
+      { name: 'Сколько идёт', value: `<t:${startedTs}:R>`, inline: true },
       { name: 'Сервер', value: data.serverId, inline: true },
-      { name: 'Статус', value: 'ПРОВОДИТСЯ', inline: true },
-      { name: 'Начало', value: `<t:${Math.floor(new Date(data.startedAt).getTime() / 1000)}:F>`, inline: false }
+      { name: 'Статус', value: 'ИДЁТ', inline: true },
+      { name: 'Начало', value: `<t:${startedTs}:F>`, inline: false }
     )
-    .setFooter({ text: `Event ID: ${data.eventUid}` })
+    .setFooter({ text: 'Foundation Portal' })
     .setTimestamp(new Date(data.startedAt));
 
   const message = await sendDiscordEventMessage({
@@ -1436,16 +1438,15 @@ async function notifyDiscordEventFinished(data) {
   const EmbedBuilder = discordClient.portalEmbedBuilder;
   const embed = new EmbedBuilder()
     .setTitle('🔴 ПРОТОКОЛ ИВЕНТА ЗАВЕРШЁН')
-    .setDescription(`**${data.eventName}**`)
+    .setDescription('Ивент завершён.')
     .addFields(
-      { name: 'Организатор', value: eventHostLabel(data), inline: true },
+      { name: 'Название ивента', value: data.eventName || 'Не указано', inline: false },
+      { name: 'Проводящий', value: eventHostLabel(data), inline: true },
       { name: 'Продолжительность', value: durationLabel(data.durationSeconds), inline: true },
-      { name: 'Начислено', value: `+${pointsLabel(data.points)}`, inline: true },
-      { name: 'Всего баллов', value: data.totalPoints === null ? 'Аккаунт не привязан' : pointsLabel(data.totalPoints), inline: true },
       { name: 'Сервер', value: data.serverId, inline: true },
       { name: 'Статус', value: 'ЗАВЕРШЁН', inline: true }
     )
-    .setFooter({ text: `Event ID: ${data.eventUid}` })
+    .setFooter({ text: 'Foundation Portal' })
     .setTimestamp();
 
   const payload = {
@@ -1454,7 +1455,7 @@ async function notifyDiscordEventFinished(data) {
   };
   const edited = await editDiscordEventMessage(data.originalMessageId, payload);
   if (!edited) await sendDiscordEventMessage(payload);
-  await sendDiscordAudit(`Ивент **${data.eventName}** завершён: ${durationLabel(data.durationSeconds)}, +${data.points} балл.`);
+  await sendDiscordAudit(`Ивент **${data.eventName}** завершён: ${durationLabel(data.durationSeconds)}.`);
 }
 
 async function notifyDiscordEventCancelled(data) {
@@ -1462,14 +1463,14 @@ async function notifyDiscordEventCancelled(data) {
   const EmbedBuilder = discordClient.portalEmbedBuilder;
   const embed = new EmbedBuilder()
     .setTitle('⚠️ ПРОТОКОЛ ИВЕНТА ОТМЕНЁН')
-    .setDescription(`**${data.eventName}**`)
+    .setDescription('Ивент был отменён.')
     .addFields(
+      { name: 'Название ивента', value: data.eventName || 'Не указано', inline: false },
       { name: 'Сервер', value: data.serverId, inline: true },
-      { name: 'Баллы', value: '0', inline: true },
       { name: 'Статус', value: 'ОТМЕНЁН', inline: true },
-      { name: 'Причина', value: data.reason || 'Не указана' }
+      { name: 'Причина', value: data.reason || 'Не указана', inline: false }
     )
-    .setFooter({ text: data.eventUid ? `Event ID: ${data.eventUid}` : 'Foundation Portal' })
+    .setFooter({ text: 'Foundation Portal' })
     .setTimestamp();
 
   const payload = { embeds: [embed], allowedMentions: { parse: [] } };
